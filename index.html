@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QuizBlast — Ad-free trivia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="grain"></div>
+
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <button class="logo" onclick="App.show('home')" aria-label="Go home">
+        <span class="logo-mark">◆</span>
+        <span class="logo-text">QUIZ<em>BLAST</em></span>
+      </button>
+      <nav class="nav">
+        <button class="nav-link" data-nav="home" onclick="App.show('home')">Library</button>
+        <button class="nav-link" data-nav="create" onclick="App.show('create')">Create</button>
+        <button class="nav-link" data-nav="import" onclick="App.show('import')">Import</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+
+    <!-- ============ HOME / LIBRARY ============ -->
+    <section id="view-home" class="view is-active">
+      <div class="hero">
+        <p class="kicker">No ads. No tracking. No nonsense.</p>
+        <h1 class="hero-title">Build a quiz.<br/>Race the clock.</h1>
+        <p class="hero-sub">Your team's own trivia arena. Make quizzes by hand, import a file, then type fast.</p>
+        <div class="hero-actions">
+          <button class="btn btn-solid" onclick="App.show('create')">Make a quiz</button>
+          <button class="btn btn-ghost" onclick="App.show('import')">Import a file</button>
+        </div>
+      </div>
+
+      <div class="library-head">
+        <h2 class="section-h">The Library</h2>
+        <span class="count-pill" id="lib-count">0 quizzes</span>
+      </div>
+
+      <div id="quiz-grid" class="quiz-grid"></div>
+
+      <div id="lib-empty" class="empty">
+        <div class="empty-mark">◇</div>
+        <p class="empty-title">Nothing here yet</p>
+        <p class="empty-sub">Create your first quiz or import one to get started.</p>
+        <div class="empty-actions">
+          <button class="btn btn-solid" onclick="App.show('create')">Make a quiz</button>
+          <button class="btn btn-ghost" onclick="App.loadSamples()">Load sample quizzes</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CREATE ============ -->
+    <section id="view-create" class="view">
+      <div class="page-head">
+        <h2 class="section-h">Build a quiz</h2>
+        <p class="page-sub">Add your questions, set a timer, save. Everything stays in your browser.</p>
+      </div>
+
+      <div class="panel">
+        <div class="field">
+          <label class="lbl">Quiz title</label>
+          <input type="text" id="c-title" class="inp" placeholder="e.g. Solar Energy Basics" />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="lbl">Category <span class="opt">(optional)</span></label>
+            <input type="text" id="c-category" class="inp" placeholder="e.g. Engineering" />
+          </div>
+          <div class="field">
+            <label class="lbl">Seconds per question</label>
+            <select id="c-timer" class="inp">
+              <option value="0">No timer</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="30" selected>30</option>
+              <option value="60">60</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="builder-head">
+        <h3 class="sub-h">Questions <span id="c-qcount" class="num-tag">0</span></h3>
+      </div>
+
+      <div id="c-list" class="q-list"></div>
+
+      <div class="add-card">
+        <div class="field-row">
+          <div class="field">
+            <label class="lbl">Question</label>
+            <input type="text" id="c-q" class="inp" placeholder="What does PV stand for?" />
+          </div>
+          <div class="field">
+            <label class="lbl">Answer</label>
+            <input type="text" id="c-a" class="inp" placeholder="Photovoltaic" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="lbl">Accepted alternatives <span class="opt">(comma-separated, optional)</span></label>
+          <input type="text" id="c-alt" class="inp" placeholder="photo voltaic, photo-voltaic" />
+        </div>
+        <div class="field">
+          <label class="lbl">Hint <span class="opt">(optional)</span></label>
+          <input type="text" id="c-hint" class="inp" placeholder="Two words, starts with P" />
+        </div>
+        <button class="btn btn-add" onclick="App.addQuestion()">+ Add question</button>
+      </div>
+
+      <div class="save-bar">
+        <button class="btn btn-solid" onclick="App.saveCreated()">Save quiz</button>
+        <button class="btn btn-ghost" onclick="App.clearCreate()">Clear</button>
+      </div>
+    </section>
+
+    <!-- ============ IMPORT ============ -->
+    <section id="view-import" class="view">
+      <div class="page-head">
+        <h2 class="section-h">Import a quiz</h2>
+        <p class="page-sub">Drop in a JSON or CSV file, or paste the contents below.</p>
+      </div>
+
+      <div class="import-grid">
+        <div class="panel">
+          <div id="dropzone" class="dropzone">
+            <div class="drop-mark">⬓</div>
+            <p class="drop-title">Drop a file here</p>
+            <p class="drop-sub">.json or .csv — or click to browse</p>
+            <input type="file" id="file-input" accept=".json,.csv,.txt" hidden />
+          </div>
+          <div class="paste-divider"><span>or paste</span></div>
+          <textarea id="paste-area" class="inp paste-box" placeholder='Paste JSON or CSV here...'></textarea>
+          <button class="btn btn-solid full" onclick="App.parsePasted()">Parse &amp; preview</button>
+          <div id="import-error" class="import-error" hidden></div>
+        </div>
+
+        <aside class="format-help">
+          <h3 class="sub-h">File formats</h3>
+          <p class="help-p"><strong>JSON</strong> — full control, supports alternatives &amp; hints:</p>
+          <pre class="code">{
+  "title": "Solar Basics",
+  "category": "Engineering",
+  "timerSecs": 30,
+  "questions": [
+    {
+      "question": "What does PV stand for?",
+      "answer": "Photovoltaic",
+      "alternatives": ["photo voltaic"],
+      "hint": "Two words"
+    }
+  ]
+}</pre>
+          <p class="help-p"><strong>CSV</strong> — quick &amp; spreadsheet-friendly. First row is a header:</p>
+          <pre class="code">question,answer,hint
+What does PV stand for?,Photovoltaic,Two words
+Capital of France?,Paris,</pre>
+          <p class="help-note">For CSV, alternatives can be added in an optional <code>alternatives</code> column using <code>|</code> to separate them.</p>
+          <button class="btn btn-ghost full" onclick="App.downloadTemplate('json')">Download JSON template</button>
+          <button class="btn btn-ghost full" onclick="App.downloadTemplate('csv')">Download CSV template</button>
+        </aside>
+      </div>
+
+      <div id="import-preview" class="preview-block" hidden>
+        <h3 class="sub-h">Preview</h3>
+        <div class="field">
+          <label class="lbl">Quiz title</label>
+          <input type="text" id="imp-title" class="inp" />
+        </div>
+        <div id="imp-list" class="q-list"></div>
+        <div class="save-bar">
+          <button class="btn btn-solid" onclick="App.saveImported()">Save to library</button>
+          <button class="btn btn-ghost" onclick="App.cancelImport()">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PLAY ============ -->
+    <section id="view-play" class="view">
+      <div id="play-area"></div>
+    </section>
+
+    <!-- ============ RESULTS ============ -->
+    <section id="view-results" class="view">
+      <div id="results-area"></div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>QuizBlast — runs entirely in your browser. Your quizzes never leave this device.</span>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
