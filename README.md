@@ -10,20 +10,6 @@ An ad-free, tracker-free trivia app that runs entirely in the browser. Make quiz
 - **Play** — typed-answer gameplay with countdown timer, progress chips, hints, prev/skip navigation
 - **Results** — per-question breakdown with your answers vs. the correct ones
 
-## Running it
-
-It's a static site — three files, no build step, no dependencies.
-
-**Locally:** just open `index.html` in any browser. (Drag it onto a browser window, or double-click it.)
-
-**Hosting for your team (free):**
-
-- **Netlify** — drag the whole folder onto https://app.netlify.com/drop. Instant URL.
-- **GitHub Pages** — push these files to a repo, enable Pages in Settings → Pages.
-- **Cloudflare Pages / Vercel** — point them at the repo, no build command needed.
-
-Because everything is client-side, each person's quizzes live in their own browser. If you want quizzes shared across the whole team automatically, that's the point where you'd add a small backend — happy to help with that later.
-
 ## Import formats
 
 ### JSON
